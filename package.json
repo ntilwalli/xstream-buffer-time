@@ -1,0 +1,32 @@
+{
+  "name": "xstream-sample",
+  "version": "1.0.0",
+  "description": "An xstream operator to sample events from another stream",
+  "main": "index.js",
+  "typings": "index.d.ts",
+  "repository": {
+    "type": "git",
+    "url": "git+https://gitlab.com/staltz/xstream-sample.git"
+  },
+  "scripts": {
+    "compile": "tsc",
+    "prepublishOnly": "npm run compile",
+    "doctest": "markdown-doctest",
+    "premocha": "npm run compile",
+    "mocha": "mocha test.ts --require ts-node/register",
+    "test": "npm run mocha && npm run doctest"
+  },
+  "author": "staltz.com",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/mocha": "5.2.x",
+    "@types/node": "^8.0.30",
+    "markdown-doctest": "0.9.1",
+    "mocha": "5.2.x",
+    "ts-node": "6.1.x",
+    "typescript": "2.5.x"
+  },
+  "dependencies": {
+    "xstream": "10.x || 11.x"
+  }
+}

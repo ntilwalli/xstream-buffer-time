@@ -1,0 +1,5 @@
+/node_modules
+/.vscode
+/index.ts
+/package-lock.json
+/shrinkwrap.yaml
