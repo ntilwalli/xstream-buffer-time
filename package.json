@@ -1,6 +1,6 @@
 {
   "name": "xstream-buffer-time",
-  "version": "1.0.0",
+  "version": "1.0.4",
   "description": "An xstream operator to buffer items with a specific time-interval",
   "main": "index.js",
   "typings": "index.d.ts",

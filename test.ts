@@ -6,9 +6,9 @@ import * as assert from 'assert';
 
 describe('sample', () => {
   it('should buffer values over time interval', (done: any) => {
-    //Create an observable that emits a value every 500ms
+    //Create an observable that emits a value every 50ms
     const source = xs.periodic(50).take(4);
-    //After 2 seconds have passed, emit buffered values as an array
+    //After 200 milliseconds have passed, emit buffered values as an array
     const example = source
       .compose(bufferTime(200));
     //Print values to console

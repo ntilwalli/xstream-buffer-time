@@ -1,4 +1,4 @@
-# `xstream-upon-start`
+# `xstream-buffer-time`
 
 ```
 pnpm install --save xstream-buffer-time
@@ -13,7 +13,7 @@ import xs from 'xstream'
 import fromDiagram from 'xstream/extra/fromDiagram'
 import bufferTime from 'xstream-buffer-time'
  
-const stream = xs.periodic(500).take(8)
+const stream = xs.periodic(50).take(8)
   .compose(bufferTime(200))
  
 stream.addListener({
@@ -26,7 +26,7 @@ stream.addListener({
 ```text
 > starting
 > [0, 1, 2]  (after 200 ms)
-> [3, 4, 5, 6]  (after 406 ms)
+> [3, 4, 5, 6]  (after 400 ms)
 > completed
 ```
 
