@@ -1,38 +1,21 @@
-# `xstream-sample`
+# `xstream-upon-start`
 
 ```
-pnpm install --save xstream-sample
+pnpm install --save xstream-buffer-time
 ```
 
-An xstream operator to get the latest events from a secondary stream whenever a
-primary stream emits.
-
-## description
-
-The result stream will emit the latest events from the "sampled" stream (provided as argument to this operator), only when the source stream emits.
-
-If the source or the sample stream emit an error, the result stream will propagate the error. The result stream will only complete upon completion of the source stream.
-
-Marble diagram:
-
-```text
---1----2-----3---------4---| (source)
-----a-----b-----c--d-|       (other)
-          sample
--------a-----b---------d---|
-```
+Emits buffered values over a set time-interval
 
 ## usage
 
 ```js
 import xs from 'xstream'
-import sample from 'xstream-sample'
-
-const source = xs.periodic(1000).take(3)
-const sampled = xs.periodic(100)
-
-const stream = source.compose(sample(sampled))
-
+import fromDiagram from 'xstream/extra/fromDiagram'
+import bufferTime from 'xstream-buffer-time'
+ 
+const stream = xs.periodic(500).take(8)
+  .compose(bufferTime(200))
+ 
 stream.addListener({
   next: i => console.log(i),
   error: err => console.error(err),
@@ -41,12 +24,14 @@ stream.addListener({
 ```
 
 ```text
-> 8
-> 18
-> 28
+> starting
+> [0, 1, 2]  (after 200 ms)
+> [3, 4, 5, 6]  (after 406 ms)
+> completed
 ```
 
 ## License
 
 MIT
+
 

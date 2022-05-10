@@ -1,12 +1,12 @@
 {
-  "name": "xstream-sample",
+  "name": "xstream-buffer-time",
   "version": "1.0.0",
-  "description": "An xstream operator to sample events from another stream",
+  "description": "An xstream operator to buffer items with a specific time-interval",
   "main": "index.js",
   "typings": "index.d.ts",
   "repository": {
     "type": "git",
-    "url": "git+https://gitlab.com/staltz/xstream-sample.git"
+    "url": "git+https://github.com/ntilwalli/xstream-buffer-time.git"
   },
   "scripts": {
     "compile": "tsc",
@@ -16,7 +16,7 @@
     "mocha": "mocha test.ts --require ts-node/register",
     "test": "npm run mocha && npm run doctest"
   },
-  "author": "staltz.com",
+  "author": "Nikhil Tilwalli",
   "license": "MIT",
   "devDependencies": {
     "@types/mocha": "5.2.x",
@@ -27,6 +27,6 @@
     "typescript": "2.5.x"
   },
   "dependencies": {
-    "xstream": "10.x || 11.x"
+    "xstream": ">=6.6.0"
   }
 }

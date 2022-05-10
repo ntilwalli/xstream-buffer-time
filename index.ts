@@ -1,93 +1,79 @@
-import {InternalListener, Operator, Stream, NO} from 'xstream';
+import {Operator, Stream} from 'xstream';
 
-export class SampleListener<T> implements InternalListener<T> {
-  constructor(private p: SampleOperator<any>) {
-    p.il = this;
+class BufferTimeOperator<T> implements Operator<T, T[]> {
+  public type = 'bufferTime';
+  public out: Stream<T[]> = null as any;
+  private buffer: T[]
+  private intervalId: any | undefined
+
+  constructor(public interval: number, public ins: Stream<T>) {
+    this.buffer = []
+    this.intervalId = undefined
   }
 
-  _n(t: T): void {
-    this.p.up(t);
-  }
-
-  _e(err: any): void {
-    this.p._e(err);
-  }
-
-  _c(): void {
-    this.p.down();
-  }
-}
-
-export class SampleOperator<T> implements Operator<any, T> {
-  public type = 'sample';
-  public ins: Stream<any>;
-  public sampled: Stream<T>;
-  public out: Stream<T>;
-  public il?: SampleListener<T>;
-  public val: T | typeof NO;
-
-  constructor(ins: Stream<any>, sampled: Stream<T>) {
-    this.ins = ins;
-    this.sampled = sampled;
-    this.out = NO as Stream<T>;
-    this.il = undefined;
-    this.val = NO;
-  }
-
-  _start(out: Stream<T>): void {
+  public _start(out: Stream<T[]>): void {
     this.out = out;
-    const s = this.sampled;
-    s._add(new SampleListener<T>(this));
+    this.intervalId = setInterval(() => {
+      this.out._n(this.buffer)
+      this.buffer = []
+    }, this.interval)
     this.ins._add(this);
   }
 
-  _stop(): void {
+  public _stop(): void {
+    this.intervalId = clearInterval(this.intervalId)
     this.ins._remove(this);
-    if (this.il) this.sampled._remove(this.il);
-    this.out = NO as Stream<T>;
-    this.val = NO;
-    this.il = undefined;
+    this.out = null as any;
   }
 
-  _n(t: any): void {
-    const out = this.out;
-    if (out === NO) return;
-    const val = this.val;
-    if (val === NO) return;
-    out._n(val as T);
+  public _n(t: T) {
+    this.buffer.push(t)
   }
 
-  _e(err: any): void {
-    const out = this.out;
-    if (out === NO) return;
-    out._e(err);
+  public _e(err: any) {
+    this.out._e(err);
   }
 
-  _c(): void {
-    const out = this.out;
-    if (out === NO) return;
-    out._c();
-  }
-
-  up(t: any): void {
-    if (this.out === NO) return;
-    this.val = t;
-  }
-
-  down(): void {
-    if (this.il) this.sampled._remove(this.il);
+  public _c() {
+    this.out._c();
   }
 }
 
 /**
- * The result stream will emit the latest events from the "sampled" stream
- * (provided as argument to this operator), only when the source stream emits.
+ * Emits buffered values over a set time-interval
  *
- * @param {Stream} sampled The stream to be sampled by the source stream
+ * Example:
+ *
+ * ```js
+ * import xs from 'xstream'
+ * import fromDiagram from 'xstream/extra/fromDiagram'
+ * import bufferTime from './index'
+ *
+ * let is_complete = false
+ * const stream = xs.periodic(50).take(8)
+ *  .compose(bufferTime(200))
+ *
+ * stream.addListener({
+ *   next: i => console.log(i),
+ *   error: err => console.error(err),
+ *   complete: () => console.log('completed')
+ * })
+ * ```
+ *
+ * ```text
+ * > starting
+ * > [0, 1, 2]  (after 200 ms)
+ * > [3, 4, 5, 6]  (after 400 ms)
+ * > completed
+ * ```
+ *
+ * @param {number} interval The interval over which to buffer values;
  * @return {Stream}
  */
-export default function sample<T>(sampled: Stream<T>) {
-  return function sampleOperator(source: Stream<any>): Stream<T> {
-    return new Stream<T>(new SampleOperator<T>(source, sampled));
+export default function bufferTime<T>(
+  interval: number
+): (ins: Stream<T>) => Stream<T[]> {
+  return function bufferTimeOperator(ins: Stream<T>): Stream<T[]> {
+    return new Stream<T[]>(new BufferTimeOperator(interval, ins));
   };
 }
